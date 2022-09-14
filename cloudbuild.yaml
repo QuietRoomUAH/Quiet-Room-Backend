@@ -1,0 +1,7 @@
+steps:
+  - name: 'mcr.microsoft.com/dotnet/sdk'
+    entrypoint: 'bash'
+    args: [ '-c', 'dotnet test' ]
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: [ '-c', 'docker build .' ]

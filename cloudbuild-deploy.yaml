@@ -1,0 +1,12 @@
+steps:
+  - name: 'mcr.microsoft.com/dotnet/sdk'
+    entrypoint: 'bash'
+    args: [ '-c', 'dotnet test' ]
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: [ '-c', 'docker build -t us-docker.pkg.dev/quietroom/quietroom-docker/backend:$SHORT_SHA .' ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'push', 'us-docker.pkg.dev/quietroom/quietroom-docker/backend:$SHORT_SHA' ]
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [ 'beta', 'run', 'jobs', 'update', 'etl-job', '--image', 'us-docker.pkg.dev/quietroom/quietroom-docker/backend:$SHORT_SHA',
+            '--region', 'us-central1' ]
