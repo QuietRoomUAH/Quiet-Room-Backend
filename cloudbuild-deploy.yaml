@@ -8,5 +8,5 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'push', 'us-docker.pkg.dev/quietroom/quietroom-docker/backend:$SHORT_SHA' ]
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: [ 'beta', 'run', 'jobs', 'update', 'etl-job', '--image', 'us-docker.pkg.dev/quietroom/quietroom-docker/backend:$SHORT_SHA',
+    args: [ 'beta', 'run', 'deploy', 'backend', '--platform=managed', '--image=us-docker.pkg.dev/quietroom/quietroom-docker/backend:$SHORT_SHA',
             '--region', 'us-central1' ]
