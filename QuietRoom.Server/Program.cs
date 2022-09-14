@@ -10,9 +10,18 @@ if (!builder.Environment.IsDevelopment())
     builder.Logging.ClearProviders();
     builder.Services.AddGoogleDiagnosticsForAspNetCore();
 }
+// Sets up open CORS, needed for StopLight
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policyBuilder =>
+    {
+        policyBuilder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 app.UseAuthorization();
+// Sets up the endpoints to have no authentication
 app.UseFastEndpoints(config =>
 {
     config.Endpoints.Configurator = ep =>
