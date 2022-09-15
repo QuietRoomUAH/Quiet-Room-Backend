@@ -16,11 +16,13 @@ public class FirestoreDbManager : IRoomRetriever, IBuildingRepository
     private const string EVENTS_COLLECTION = "events";
     private const string TERM = "20229";
     private const string PROJECT_ID = "quietroom";
-
+    
+    private readonly ILogger<FirestoreDbManager> _logger;
     private readonly FirestoreDb _db;
     
-    public FirestoreDbManager()
+    public FirestoreDbManager(ILogger<FirestoreDbManager> logger)
     {
+        _logger = logger;
         _db = FirestoreDb.Create(PROJECT_ID);
     }
 
@@ -47,9 +49,12 @@ public class FirestoreDbManager : IRoomRetriever, IBuildingRepository
         
                 if (isAvailable)
                 {
+                    _logger.LogInformation("Room {Room} is available", reference.Id);
                     roomsAvailable.Add(reference.Id);
                 }
             });
+        _logger.LogInformation("For Building {Building} with StartTime {StartTime} and EndTime {EndTime}, found {Count} available rooms", 
+            buildingCode, startTime, endTime, roomsAvailable.Count);
         return roomsAvailable;
     }
 

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FastEndpoints;
 using FluentValidation;
 using JetBrains.Annotations;
@@ -9,10 +10,12 @@ namespace QuietRoom.Server.Endpoints;
 public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Request, List<string>>
 {
     private readonly IRoomRetriever _roomRetriever;
-    
-    public GetAvailableRoomsEndpoint(IRoomRetriever roomRetriever)
+    private readonly ILogger<GetAvailableRoomsEndpoint> _logger;
+
+    public GetAvailableRoomsEndpoint(IRoomRetriever roomRetriever, ILogger<GetAvailableRoomsEndpoint> logger)
     {
         _roomRetriever = roomRetriever;
+        _logger = logger;
     }
     
     /// <inheritdoc />
@@ -25,9 +28,13 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
     public override async Task<List<string>> ExecuteAsync(Request req, CancellationToken ct)
     {
         var day = GetDayOfWeek(req.Day);
+        _logger.LogInformation("Getting available rooms for request {Request}", req);
+        var sw = Stopwatch.StartNew();
         var rooms = await _roomRetriever
             .GetAvailableRoomsAsync(req.BuildingCode, TimeOnlyUtils.ParseTime(req.StartTime), TimeOnlyUtils.ParseTime(req.EndTime), day);
-        return rooms.ToList();
+        var roomsList = rooms.ToList();
+        _logger.LogInformation("Got {Count} rooms in {Elapsed}ms", roomsList.Count, sw.ElapsedMilliseconds);
+        return roomsList;
     }
 
     private DayOfWeek GetDayOfWeek(string day)
@@ -46,7 +53,7 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
     }
         
     [UsedImplicitly]
-    public class Request
+    public record Request
     {
         public Request()
         {
