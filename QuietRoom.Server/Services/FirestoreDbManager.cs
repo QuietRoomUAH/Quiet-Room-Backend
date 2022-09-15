@@ -39,6 +39,7 @@ public class FirestoreDbManager : IRoomRetriever, IBuildingRepository
             {
                 var events = reference.Collection(TERMS_COLLECTION).Document(TERM).Collection(EVENTS_COLLECTION).ListDocumentsAsync();
                 var isAvailable = true;
+                // ReSharper disable once LoopCanBeConvertedToQuery
                 await foreach (var termEventRef in events)
                 {
                     var firestoreEvent = (await termEventRef.GetSnapshotAsync()).ConvertTo<FirestoreEvent>();

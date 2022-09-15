@@ -29,15 +29,25 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
     {
         var day = GetDayOfWeek(req.Day);
         _logger.LogInformation("Getting available rooms for request {Request}", req);
+        TimeOnly startTime;
+        TimeOnly endTime;
+        try
+        {
+            startTime = TimeOnlyUtils.ParseTime(req.StartTime);
+            endTime = TimeOnlyUtils.ParseTime(req.EndTime);
+        } catch (ArgumentOutOfRangeException)
+        {
+            ThrowError("One of the times sent as input is not valid");
+            return new List<string>();
+        }
         var sw = Stopwatch.StartNew();
-        var rooms = await _roomRetriever
-            .GetAvailableRoomsAsync(req.BuildingCode, TimeOnlyUtils.ParseTime(req.StartTime), TimeOnlyUtils.ParseTime(req.EndTime), day);
+        var rooms = await _roomRetriever.GetAvailableRoomsAsync(req.BuildingCode, startTime, endTime, day);
         var roomsList = rooms.ToList();
         _logger.LogInformation("Got {Count} rooms in {Elapsed}ms", roomsList.Count, sw.ElapsedMilliseconds);
         return roomsList;
     }
 
-    private DayOfWeek GetDayOfWeek(string day)
+    private static DayOfWeek GetDayOfWeek(string day)
     {
         return day switch
         {

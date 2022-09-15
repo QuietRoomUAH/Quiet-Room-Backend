@@ -12,6 +12,6 @@ public interface IRoomRetriever
     /// <param name="startTime">The start of the time window for which there should be no events</param>
     /// <param name="endTime">The end of the time window for which there should be no events</param>
     /// <param name="dayOfWeek">The day to look for</param>
-    /// <returns>A list of room numbers</returns>
+    /// <returns>A list of room numbers. This can be empty if the building doesn't exist</returns>
     public Task<IEnumerable<string>> GetAvailableRoomsAsync(string buildingCode, TimeOnly startTime, TimeOnly endTime, DayOfWeek dayOfWeek);
 }
