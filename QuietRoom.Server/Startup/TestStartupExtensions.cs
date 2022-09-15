@@ -16,7 +16,7 @@ public static class TestStartupExtensions
     public class TestRoomRetriever : IRoomRetriever
     {
         /// <inheritdoc />
-        public Task<IEnumerable<string>> GetAvailableRoomsAsync(string buildingCode, TimeOnly startTime, TimeOnly endTime)
+        public Task<IEnumerable<string>> GetAvailableRoomsAsync(string buildingCode, TimeOnly startTime, TimeOnly endTime, DayOfWeek day)
         {
             return Task.FromResult<IEnumerable<string>>(new[] { "101", "102", "103" });
         }

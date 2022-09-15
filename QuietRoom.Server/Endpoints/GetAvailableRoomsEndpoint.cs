@@ -1,14 +1,13 @@
-using System.Text.RegularExpressions;
 using FastEndpoints;
 using FluentValidation;
 using JetBrains.Annotations;
 using QuietRoom.Server.Services.Interfaces;
+using QuietRoom.Server.Utils;
 
 namespace QuietRoom.Server.Endpoints;
 
 public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Request, List<string>>
 {
-    private const string TIME_REGEX = @"^(\d\d)(\d\d)$";
     private readonly IRoomRetriever _roomRetriever;
     
     public GetAvailableRoomsEndpoint(IRoomRetriever roomRetriever)
@@ -25,19 +24,27 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
     /// <inheritdoc />
     public override async Task<List<string>> ExecuteAsync(Request req, CancellationToken ct)
     {
+        var day = GetDayOfWeek(req.Day);
         var rooms = await _roomRetriever
-            .GetAvailableRoomsAsync(req.BuildingCode, ParseTime(req.StartTime), ParseTime(req.EndTime));
+            .GetAvailableRoomsAsync(req.BuildingCode, TimeOnlyUtils.ParseTime(req.StartTime), TimeOnlyUtils.ParseTime(req.EndTime), day);
         return rooms.ToList();
     }
 
-    private static TimeOnly ParseTime(string time)
+    private DayOfWeek GetDayOfWeek(string day)
     {
-        var match = Regex.Match(time, TIME_REGEX);
-        var hour = int.Parse(match.Groups[1].Value);
-        var minute = int.Parse(match.Groups[2].Value);
-        return new TimeOnly(hour, minute);
+        return day switch
+        {
+            "M" => DayOfWeek.Monday,
+            "T" => DayOfWeek.Tuesday,
+            "W" => DayOfWeek.Wednesday,
+            "R" => DayOfWeek.Thursday,
+            "F" => DayOfWeek.Friday,
+            "S" => DayOfWeek.Saturday,
+            "U" => DayOfWeek.Sunday,
+            _ => throw new ArgumentOutOfRangeException(nameof(day), day, null)
+        };
     }
-
+        
     [UsedImplicitly]
     public class Request
     {
@@ -46,6 +53,7 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
             BuildingCode = null!;
             StartTime = null!;
             EndTime = null!;
+            Day = null!;
         }
         
         [UsedImplicitly]
@@ -54,6 +62,8 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
         public string StartTime { get; set; }
         [UsedImplicitly]
         public string EndTime { get; set; }
+        [UsedImplicitly]
+        public string Day { get; set; }
     }
 
     public class RequestValidator : Validator<Request>
@@ -63,13 +73,18 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
             RuleFor(request => request.StartTime)
                 .NotEmpty()
                 .WithMessage("Start time is required")
-                .Matches(TIME_REGEX)
+                .Matches(TimeOnlyUtils.TIME_REGEX)
                 .WithMessage("Start time must be in the format HHMM");
             RuleFor(request => request.EndTime)
                 .NotEmpty()
                 .WithMessage("Start time is required")
-                .Matches(TIME_REGEX)
+                .Matches(TimeOnlyUtils.TIME_REGEX)
                 .WithMessage("Start time must be in the format HHMM");
+            RuleFor(request => request.Day)
+                .NotEmpty()
+                .WithMessage("Day is required")
+                .Matches("^[MTWRFSU]$")
+                .WithMessage("Day must be one of M, T, W, R, F, S, U");
         }
     }
 }

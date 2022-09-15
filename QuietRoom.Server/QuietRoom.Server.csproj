@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="FastEndpoints" Version="5.1.0" />
     <PackageReference Include="Google.Cloud.Diagnostics.AspNetCore3" Version="5.0.0" />
+    <PackageReference Include="Google.Cloud.Firestore" Version="3.0.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
   </ItemGroup>
 

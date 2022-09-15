@@ -3,7 +3,7 @@ using Google.Cloud.Diagnostics.AspNetCore3;
 using QuietRoom.Server.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.UseTestRoomRetriever();
+builder.Services.UseGoogleServices();
 builder.Services.AddFastEndpoints();
 if (!builder.Environment.IsDevelopment())
 {
