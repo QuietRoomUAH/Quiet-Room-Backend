@@ -8,7 +8,7 @@ namespace QuietRoom.Server.Services;
 /// <summary>
 /// Implementation of the room retriever service using Firestore.
 /// </summary>
-public class FirestoreRoomRetriever : IRoomRetriever
+public class FirestoreDbManager : IRoomRetriever, IBuildingRepository
 {
     private const string BUILDINGS_COLLECTION = "buildings";
     private const string ROOMS_COLLECTION = "rooms";
@@ -19,7 +19,7 @@ public class FirestoreRoomRetriever : IRoomRetriever
 
     private readonly FirestoreDb _db;
     
-    public FirestoreRoomRetriever()
+    public FirestoreDbManager()
     {
         _db = FirestoreDb.Create(PROJECT_ID);
     }
@@ -51,6 +51,13 @@ public class FirestoreRoomRetriever : IRoomRetriever
                 }
             });
         return roomsAvailable;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<string>> GetBuildingNamesAsync()
+    {
+        var buildings = _db.Collection(BUILDINGS_COLLECTION).ListDocumentsAsync();
+        return await buildings.Select(reference => reference.Id).ToHashSetAsync();
     }
 
     private static async Task ForEachConcurrentAsync<T>(
