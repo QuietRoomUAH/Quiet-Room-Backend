@@ -43,9 +43,11 @@ public class FirestoreDbManager : IRoomRetriever, IBuildingRepository
                 await foreach (var termEventRef in events)
                 {
                     var firestoreEvent = (await termEventRef.GetSnapshotAsync()).ConvertTo<FirestoreEvent>();
-                    if (!IsConflict(firestoreEvent, startTime, endTime, day)) continue;
-                    isAvailable = false;
-                    break;
+                    if (IsConflict(firestoreEvent, startTime, endTime, day) || firestoreEvent.Name.EndsWith("L"))
+                    {
+                        isAvailable = false;
+                        break;
+                    }
                 }
         
                 if (isAvailable)
@@ -77,10 +79,11 @@ public class FirestoreDbManager : IRoomRetriever, IBuildingRepository
     {
         var eventStart = TimeOnlyUtils.ParseTime(firestoreEvent.StartTime);
         var eventEnd = TimeOnlyUtils.ParseTime(firestoreEvent.EndTime);
-        return firestoreEvent.DaysMet.Any(s => s == dayOfWeek.ToString())
+        var conflict = firestoreEvent.DaysMet.Any(s => s.Equals(dayOfWeek.ToString(), StringComparison.OrdinalIgnoreCase))
             && firestoreEvent.StartDate <= DateTimeOffset.Now 
             && firestoreEvent.EndDate >= DateTimeOffset.Now 
-            && (eventStart <= startTime && eventEnd >= startTime || eventStart <= endTime && eventEnd >= endTime);
+            && (eventStart <= endTime && startTime <= eventEnd);
+        return conflict;
     }
 
     [UsedImplicitly]
