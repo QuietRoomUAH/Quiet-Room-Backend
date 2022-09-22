@@ -42,7 +42,7 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
         }
         var sw = Stopwatch.StartNew();
         var rooms = await _roomRetriever.GetAvailableRoomsAsync(req.BuildingCode, startTime, endTime, day);
-        var roomsList = rooms.ToList();
+        var roomsList = rooms.OrderBy(s => s).ToList();
         _logger.LogInformation("Got {Count} rooms in {Elapsed}ms", roomsList.Count, sw.ElapsedMilliseconds);
         return roomsList;
     }
