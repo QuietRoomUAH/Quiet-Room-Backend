@@ -42,9 +42,9 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
         }
         var sw = Stopwatch.StartNew();
         var rooms = await _roomRepository.GetAvailableRoomsAsync(req.BuildingCode, startTime, endTime, day);
-        var roomsList = rooms.OrderBy(s => s).ToList();
+        var roomsList = rooms.OrderBy(s => s.RoomNumber).Select(dto => dto.RoomNumber).ToList();
         _logger.LogInformation("Got {Count} rooms in {Elapsed}ms", roomsList.Count, sw.ElapsedMilliseconds);
-        return roomsList.Select(dto => dto.RoomNumber).ToList();
+        return roomsList;
     }
 
     private static DayOfWeek GetDayOfWeek(string day)
