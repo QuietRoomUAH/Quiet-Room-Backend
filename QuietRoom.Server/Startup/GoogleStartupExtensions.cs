@@ -7,7 +7,7 @@ public static class GoogleStartupExtensions
 {
     public static IServiceCollection UseGoogleServices(this IServiceCollection services)
     {
-        services.AddSingleton<IRoomRetriever, FirestoreDbManager>();
+        services.AddSingleton<IRoomRepository, FirestoreDbManager>();
         services.AddSingleton<IBuildingRepository, FirestoreDbManager>();
         return services;
     }

@@ -1,5 +1,6 @@
 using Google.Cloud.Firestore;
 using JetBrains.Annotations;
+using QuietRoom.Server.Models;
 using QuietRoom.Server.Services.Interfaces;
 using QuietRoom.Server.Utils;
 
@@ -8,7 +9,7 @@ namespace QuietRoom.Server.Services;
 /// <summary>
 /// Implementation of the room retriever service using Firestore.
 /// </summary>
-public class FirestoreDbManager : IRoomRetriever, IBuildingRepository
+public class FirestoreDbManager : IRoomRepository, IBuildingRepository
 {
     private const string BUILDINGS_COLLECTION = "buildings";
     private const string ROOMS_COLLECTION = "rooms";
@@ -27,7 +28,7 @@ public class FirestoreDbManager : IRoomRetriever, IBuildingRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<string>> GetAvailableRoomsAsync(string buildingCode, TimeOnly startTime, TimeOnly endTime, DayOfWeek day)
+    public async Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(string buildingCode, TimeOnly startTime, TimeOnly endTime, DayOfWeek day)
     {
         var roomsCollection = _db.Collection(BUILDINGS_COLLECTION)
             .Document(buildingCode)
@@ -58,7 +59,8 @@ public class FirestoreDbManager : IRoomRetriever, IBuildingRepository
             });
         _logger.LogInformation("For Building {Building} with StartTime {StartTime} and EndTime {EndTime}, found {Count} available rooms", 
             buildingCode, startTime, endTime, roomsAvailable.Count);
-        return roomsAvailable;
+        var roomDtos = roomsAvailable.Select(roomCode => new RoomDto(buildingCode, roomCode, 0, null));
+        return roomDtos;
     }
 
     /// <inheritdoc />

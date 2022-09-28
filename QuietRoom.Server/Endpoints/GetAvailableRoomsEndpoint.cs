@@ -9,12 +9,12 @@ namespace QuietRoom.Server.Endpoints;
 
 public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Request, List<string>>
 {
-    private readonly IRoomRetriever _roomRetriever;
+    private readonly IRoomRepository _roomRepository;
     private readonly ILogger<GetAvailableRoomsEndpoint> _logger;
 
-    public GetAvailableRoomsEndpoint(IRoomRetriever roomRetriever, ILogger<GetAvailableRoomsEndpoint> logger)
+    public GetAvailableRoomsEndpoint(IRoomRepository roomRepository, ILogger<GetAvailableRoomsEndpoint> logger)
     {
-        _roomRetriever = roomRetriever;
+        _roomRepository = roomRepository;
         _logger = logger;
     }
     
@@ -41,10 +41,10 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
             return new List<string>();
         }
         var sw = Stopwatch.StartNew();
-        var rooms = await _roomRetriever.GetAvailableRoomsAsync(req.BuildingCode, startTime, endTime, day);
+        var rooms = await _roomRepository.GetAvailableRoomsAsync(req.BuildingCode, startTime, endTime, day);
         var roomsList = rooms.OrderBy(s => s).ToList();
         _logger.LogInformation("Got {Count} rooms in {Elapsed}ms", roomsList.Count, sw.ElapsedMilliseconds);
-        return roomsList;
+        return roomsList.Select(dto => dto.RoomNumber).ToList();
     }
 
     private static DayOfWeek GetDayOfWeek(string day)
