@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Google.Cloud.Firestore;
 using JetBrains.Annotations;
 using QuietRoom.Server.Models;
@@ -59,9 +60,12 @@ public class FirestoreDbManager : IRoomRepository, IBuildingRepository
             });
         _logger.LogInformation("For Building {Building} with StartTime {StartTime} and EndTime {EndTime}, found {Count} available rooms", 
             buildingCode, startTime, endTime, roomsAvailable.Count);
-        var roomDtos = roomsAvailable.Select(roomCode => new RoomDto(buildingCode, roomCode, 0, null));
+        var roomDtos = roomsAvailable.Select(roomCode => new RoomDto(buildingCode, roomCode, 0, null, ImmutableList<EventDto>.Empty));
         return roomDtos;
     }
+
+    /// <inheritdoc />
+    public Task<RoomDto?> GetRoomInfoAsync(string buildingCode, string roomNumber) => throw new NotSupportedException();
 
     /// <inheritdoc />
     public async Task<IEnumerable<string>> GetBuildingNamesAsync()

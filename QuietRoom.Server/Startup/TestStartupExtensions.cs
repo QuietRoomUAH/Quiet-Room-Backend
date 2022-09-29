@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using QuietRoom.Server.Models;
 using QuietRoom.Server.Services.Interfaces;
 
@@ -20,8 +21,11 @@ public static class TestStartupExtensions
         public Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(string buildingCode, TimeOnly startTime, TimeOnly endTime, DayOfWeek day)
         {
             var roomCodes = new[] { "101", "102", "103" };
-            var roomDtos = roomCodes.Select(roomCode => new RoomDto(buildingCode, roomCode, 0, null));
+            var roomDtos = roomCodes.Select(roomCode => new RoomDto(buildingCode, roomCode, 0, null, ImmutableList<EventDto>.Empty));
             return Task.FromResult(roomDtos);
         }
+
+        /// <inheritdoc />
+        public Task<RoomDto?> GetRoomInfoAsync(string buildingCode, string roomNumber) => throw new NotSupportedException();
     }
 }

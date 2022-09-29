@@ -13,4 +13,14 @@ public static class TimeOnlyUtils
         var minute = int.Parse(match.Groups[2].Value);
         return new TimeOnly(hour, minute);
     }
+
+    /// <summary>
+    /// Takes a time only and converts it into a very basic string
+    /// </summary>
+    /// <param name="time">The time to convert</param>
+    /// <returns>The string in the format of HHmm</returns>
+    public static string ToBasicString(this TimeOnly time)
+    {
+        return time.ToString("HHmm");
+    }
 }

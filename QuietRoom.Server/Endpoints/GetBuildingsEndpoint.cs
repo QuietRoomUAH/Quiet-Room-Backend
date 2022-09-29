@@ -16,6 +16,7 @@ public class GetBuildingsEndpoint : EndpointWithoutRequest<List<string>>
     public override void Configure()
     {
         Get("/buildings");
+        ResponseCache(500);
     }
 
     /// <inheritdoc />

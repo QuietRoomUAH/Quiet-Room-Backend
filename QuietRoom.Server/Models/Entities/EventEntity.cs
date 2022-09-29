@@ -6,7 +6,7 @@ namespace QuietRoom.Server.Models.Entities;
 
 // Non-nullable field is uninitialized. Consider declaring as nullable.
 #pragma warning disable CS8618 
-[Table("events"), UsedImplicitly]
+[Table("events"), UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class EventEntity
 {
     [Key]
@@ -22,11 +22,26 @@ public class EventEntity
     public string RoomNumber { get; set; }
     public string BuildingCode { get; set; }
     public RoomEntity Room { get; set; }
-    
-    [Table("event_days"), UsedImplicitly]
+
+    [Table("event_days"), UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class DayMetEntity
     {
         public EventEntity Event { get; set; }
         public string DaysMet { get; set; }
+    }
+
+    public EventDto ToDto(IEnumerable<DayOfWeek> daysMet)
+    {
+        return new EventDto
+        (
+            Name,
+            BuildingCode,
+            RoomNumber,
+            StartTime,
+            EndTime,
+            daysMet.ToArray(),
+            StartDate,
+            EndDate
+        );
     }
 }

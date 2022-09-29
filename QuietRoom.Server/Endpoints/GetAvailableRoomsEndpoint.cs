@@ -62,7 +62,7 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
         };
     }
         
-    [UsedImplicitly]
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public record Request
     {
         public Request()
@@ -73,13 +73,9 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
             Day = null!;
         }
         
-        [UsedImplicitly]
         public string BuildingCode { get; set; }
-        [UsedImplicitly]
         public string StartTime { get; set; }
-        [UsedImplicitly]
         public string EndTime { get; set; }
-        [UsedImplicitly]
         public string Day { get; set; }
     }
 
