@@ -1,5 +1,6 @@
 using FastEndpoints;
 using Google.Cloud.Diagnostics.AspNetCore3;
+using QuietRoom.Server.Middleware;
 using QuietRoom.Server.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ if (!builder.Environment.IsDevelopment())
 }
 
 var app = builder.Build();
+app.UseRemoveContentTypeMiddleware();
 app.UseResponseCaching();
 app.UseAuthorization();
 app.UseCors();
