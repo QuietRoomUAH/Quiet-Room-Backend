@@ -10,12 +10,10 @@ namespace QuietRoom.Server.Endpoints;
 public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Request, List<string>>
 {
     private readonly IRoomRepository _roomRepository;
-    private readonly ILogger<GetAvailableRoomsEndpoint> _logger;
 
     public GetAvailableRoomsEndpoint(IRoomRepository roomRepository, ILogger<GetAvailableRoomsEndpoint> logger)
     {
         _roomRepository = roomRepository;
-        _logger = logger;
     }
     
     /// <inheritdoc />
@@ -28,7 +26,7 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
     public override async Task<List<string>> ExecuteAsync(Request req, CancellationToken ct)
     {
         var day = GetDayOfWeek(req.Day);
-        _logger.LogInformation("Getting available rooms for request {Request}", req);
+        Logger.LogInformation("Getting available rooms for request {Request}", req);
         TimeOnly startTime;
         TimeOnly endTime;
         try
@@ -43,7 +41,7 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
         var sw = Stopwatch.StartNew();
         var rooms = await _roomRepository.GetAvailableRoomsAsync(req.BuildingCode, startTime, endTime, day);
         var roomsList = rooms.OrderBy(s => s.RoomNumber).Select(dto => dto.RoomNumber).ToList();
-        _logger.LogInformation("Got {Count} rooms in {Elapsed}ms", roomsList.Count, sw.ElapsedMilliseconds);
+        Logger.LogInformation("Got {Count} rooms in {Elapsed}ms", roomsList.Count, sw.ElapsedMilliseconds);
         return roomsList;
     }
 

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FastEndpoints;
 using QuietRoom.Server.Services.Interfaces;
 
@@ -22,7 +23,10 @@ public class GetBuildingsEndpoint : EndpointWithoutRequest<List<string>>
     /// <inheritdoc />
     public override async Task<List<string>> ExecuteAsync(CancellationToken ct)
     {
+        Logger.LogDebug("Getting buildings");
+        var sw = Stopwatch.StartNew();
         var names = await _buildingRepository.GetBuildingNamesAsync();
+        Logger.LogInformation("Got buildings in {ElapsedMilliseconds}ms", sw.ElapsedMilliseconds);
         return names.ToList();
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FastEndpoints;
 using JetBrains.Annotations;
 using QuietRoom.Server.Models;
@@ -25,13 +26,15 @@ public class GetRoomEndpoint : Endpoint<GetRoomEndpoint.Request, RoomDto>
     /// <inheritdoc />
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        var sw = Stopwatch.StartNew();
         var roomDto = await _roomRepository.GetRoomInfoAsync(req.BuildingCode, req.RoomCode);
         if (roomDto is null)
         {
             await SendNotFoundAsync(ct);
             return;
         }
-
+        Logger.LogInformation("Got room {RoomCode} in building {BuildingCode} in {ElapsedMilliseconds}ms", req.RoomCode, req.BuildingCode, 
+            sw.ElapsedMilliseconds);
         await SendStringAsync(roomDto.ToJson(), contentType: "application/json", cancellation: ct);
     }
 
