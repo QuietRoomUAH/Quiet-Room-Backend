@@ -21,6 +21,7 @@ public class SupabaseDbContext : DbContext
     {
         optionsBuilder
             .UseNpgsql($"{_configuration["ConnectionStrings:Supabase"]}Password={Environment.GetEnvironmentVariable("DB_PASS")}")
+            .EnableSensitiveDataLogging()
             .UseSnakeCaseNamingConvention();
     }
 
