@@ -17,10 +17,10 @@ if (!builder.Environment.IsDevelopment())
 }
 
 var app = builder.Build();
+app.UseCors();
 app.UseRemoveContentTypeMiddleware();
 app.UseResponseCaching();
 app.UseAuthorization();
-app.UseCors();
 app.UseFastEndpoints(config =>
 {
     config.Endpoints.Configurator = ep =>
