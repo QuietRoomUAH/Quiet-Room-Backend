@@ -15,7 +15,6 @@
       "applicationUrl": "http://localhost:5173",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DB_PASS": "IP05jgfFYqpo0TBQ"
       }
     },
     "IIS Express": {
