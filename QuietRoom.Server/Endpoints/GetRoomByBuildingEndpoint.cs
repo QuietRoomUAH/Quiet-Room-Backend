@@ -11,7 +11,7 @@ public record Request
     public string BuildingCode { get; set; } = null!;
 };
 
-public class GetRoomByBuildingEndpoint : Endpoint<Request, IEnumerable<RoomDto>>
+public class GetRoomByBuildingEndpoint : Endpoint<Request, ImmutableArray<RoomDto>>
 {
     private readonly IBuildingRepository _buildingRepository;
     
@@ -28,7 +28,7 @@ public class GetRoomByBuildingEndpoint : Endpoint<Request, IEnumerable<RoomDto>>
     }
 
     /// <inheritdoc />
-    public override async Task<IEnumerable<RoomDto>> ExecuteAsync(Request req, CancellationToken ct)
+    public override async Task HandleAsync(Request req, CancellationToken ct)
     {
         var sw = Stopwatch.StartNew();
 
@@ -38,6 +38,6 @@ public class GetRoomByBuildingEndpoint : Endpoint<Request, IEnumerable<RoomDto>>
             roomDtos.Length, req.BuildingCode,
             sw.ElapsedMilliseconds);
 
-        return roomDtos;
+        await SendOkAsync(roomDtos, cancellation: ct);
     }
 }
