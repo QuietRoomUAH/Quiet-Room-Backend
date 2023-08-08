@@ -23,7 +23,7 @@ public class GetRoomByBuildingEndpoint : Endpoint<Request, IEnumerable<RoomDto>>
     /// <inheritdoc />
     public override void Configure()
     {
-        Get("/building/{BuildingCode}/room");
+        Get("/building/{BuildingCode}/rooms");
         ResponseCache(500);
     }
 
