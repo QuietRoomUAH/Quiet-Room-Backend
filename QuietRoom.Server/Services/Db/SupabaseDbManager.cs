@@ -29,8 +29,9 @@ public class SupabaseDbManager : IBuildingRepository, IRoomRepository
     {
         var rooms = _dbContext.Rooms
             .Where(roomEntity => roomEntity.BuildingCode == buildingCode);
+        var emptyList = ImmutableList<EventDto>.Empty;
         var roomDtos = rooms.Select(roomEntity => new RoomDto(roomEntity.BuildingCode, roomEntity.RoomNumber,
-            roomEntity.Capacity, roomEntity.RoomType, ImmutableList<EventDto>.Empty));
+            roomEntity.Capacity, roomEntity.RoomType, emptyList));
         return await roomDtos.ToArrayAsync();
     }
 

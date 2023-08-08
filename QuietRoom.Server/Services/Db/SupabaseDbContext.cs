@@ -20,7 +20,7 @@ public class SupabaseDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder
-            .UseNpgsql($"{_configuration["ConnectionStrings:Supabase"]}Password={Environment.GetEnvironmentVariable("DB_PASS")}")
+            .UseNpgsql($"{_configuration["ConnectionStrings:Supabase"]}Password={_configuration["DB_PASS"]}")
             .EnableSensitiveDataLogging()
             .UseSnakeCaseNamingConvention();
     }
