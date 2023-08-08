@@ -74,6 +74,9 @@ public class FirestoreDbManager : IRoomRepository, IBuildingRepository
         return await buildings.Select(reference => reference.Id).ToHashSetAsync();
     }
 
+    /// <inheritdoc />
+    public Task<IEnumerable<RoomDto>> GetRoomNumbersAsync(string buildingCode) => throw new NotImplementedException();
+
     private static async Task ForEachConcurrentAsync<T>(
         IAsyncEnumerable<T> source,
         Func<T, Task> action)

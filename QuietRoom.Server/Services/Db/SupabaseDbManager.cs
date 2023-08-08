@@ -25,6 +25,16 @@ public class SupabaseDbManager : IBuildingRepository, IRoomRepository
     }
 
     /// <inheritdoc />
+    public async Task<IEnumerable<RoomDto>> GetRoomNumbersAsync(string buildingCode)
+    {
+        var rooms = _dbContext.Rooms
+            .Where(roomEntity => roomEntity.BuildingCode == buildingCode);
+        var roomDtos = rooms.Select(roomEntity => new RoomDto(roomEntity.BuildingCode, roomEntity.RoomNumber,
+            roomEntity.Capacity, roomEntity.RoomType, ImmutableList<EventDto>.Empty));
+        return await roomDtos.ToArrayAsync();
+    }
+
+    /// <inheritdoc />
     public Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(string buildingCode, TimeOnly startTime, TimeOnly endTime,
                                                                   DayOfWeek dayOfWeek)
     {
