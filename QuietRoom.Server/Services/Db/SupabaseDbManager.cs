@@ -85,4 +85,22 @@ public class SupabaseDbManager : IBuildingRepository, IRoomRepository
         var roomDto = roomEntity.ToDto(daysMet);
         return Task.FromResult((RoomDto?) roomDto);
     }
+
+    /// <inheritdoc />
+    public async Task<bool> IsRoomAvailableAsync(string buildingCode, string roomNumber)
+    {
+        var room = await GetRoomInfoAsync(buildingCode, roomNumber);
+        if (room is null) return false;
+        var now = DateTime.UtcNow;
+        var nowTime = TimeOnly.FromDateTime(now);
+        var nowDate = DateOnly.FromDateTime(now);
+        var today = now.DayOfWeek;
+        var areEventsNow = room.Events.Any(eventDto => 
+            eventDto.StartDate < nowDate && 
+            eventDto.EndDate > nowDate && 
+            eventDto.StartTime < nowTime && 
+            eventDto.EndTime > nowTime &&
+            eventDto.DaysMet.Contains(today));
+        return !areEventsNow;
+    }
 }

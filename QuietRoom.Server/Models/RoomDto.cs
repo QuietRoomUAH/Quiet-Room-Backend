@@ -7,7 +7,8 @@ namespace QuietRoom.Server.Models;
 /// <summary>
 /// Represents a room as a data transfer object
 /// </summary>
-public record RoomDto(string BuildingCode, string RoomNumber, int Capacity, string? RoomType, ImmutableList<EventDto> Events)
+public record RoomDto(string BuildingCode, string RoomNumber, int Capacity, string? RoomType, 
+                      ImmutableList<EventDto> Events)
 {
     public string ToJson()
     {
