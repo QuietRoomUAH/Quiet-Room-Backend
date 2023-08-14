@@ -1,6 +1,8 @@
 using FastEndpoints;
 using Google.Cloud.Diagnostics.AspNetCore3;
 using QuietRoom.Server.Middleware;
+using QuietRoom.Server.Services;
+using QuietRoom.Server.Services.Interfaces;
 using QuietRoom.Server.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,7 @@ builder.Services.AddCors(options =>
 builder.Services.UseSupabase();
 builder.Services.AddFastEndpoints();
 builder.Services.AddResponseCaching();
+builder.Services.AddSingleton<ITimeProvider, SimpleTimeProvider>();
 if (!builder.Environment.IsDevelopment())
 {
     builder.Logging.ClearProviders();
@@ -30,6 +33,9 @@ app.UseFastEndpoints(config =>
 });
 app.UseDefaultExceptionHandler();
 if (app.Environment.IsDevelopment()) app.Run();
-// Set the app to run based on google cloud port
-var url = $"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT") ?? "8080"}";
-app.Run(url);
+else
+{
+    // Set the app to run based on google cloud port
+    var url = $"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT") ?? "8080"}";
+    app.Run(url);
+}
