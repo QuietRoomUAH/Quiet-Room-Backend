@@ -15,6 +15,8 @@ public static class TestStartupExtensions
         return services;
     }
     
+    // TODO: I'll get to some of these tests eventually
+    
     public class TestRoomRepository : IRoomRepository
     {
         /// <inheritdoc />
@@ -27,5 +29,8 @@ public static class TestStartupExtensions
 
         /// <inheritdoc />
         public Task<RoomDto?> GetRoomInfoAsync(string buildingCode, string roomNumber) => throw new NotSupportedException();
+
+        /// <inheritdoc />
+        public async Task<bool> IsRoomAvailableAsync(string buildingCode, string roomNumber) => throw new NotSupportedException();
     }
 }

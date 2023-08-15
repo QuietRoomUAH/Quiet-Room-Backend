@@ -25,4 +25,12 @@ public interface IRoomRepository
     /// <param name="roomNumber">The room to get the info for</param>
     /// <returns>A list of room DTOs. These DTOs are guaranteed to be full representations</returns>
     public Task<RoomDto?> GetRoomInfoAsync(string buildingCode, string roomNumber);
+    
+    /// <summary>
+    /// Gets if a room is currently available
+    /// </summary>
+    /// <param name="buildingCode">The building of the room</param>
+    /// <param name="roomNumber">The number of the room</param>
+    /// <returns>True if the room is available</returns>
+    public Task<bool> IsRoomAvailableAsync(string buildingCode, string roomNumber);
 }

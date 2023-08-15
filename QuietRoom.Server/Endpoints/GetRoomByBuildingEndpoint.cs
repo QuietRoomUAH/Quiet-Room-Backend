@@ -6,12 +6,7 @@ using QuietRoom.Server.Services.Interfaces;
 
 namespace QuietRoom.Server.Endpoints;
 
-public record Request
-{
-    public string BuildingCode { get; set; } = null!;
-};
-
-public class GetRoomByBuildingEndpoint : Endpoint<Request, ImmutableArray<RoomDto>>
+public class GetRoomByBuildingEndpoint : Endpoint<GetRoomByBuildingEndpoint.Request, ImmutableArray<RoomDto>>
 {
     private readonly IBuildingRepository _buildingRepository;
     
@@ -40,4 +35,9 @@ public class GetRoomByBuildingEndpoint : Endpoint<Request, ImmutableArray<RoomDt
 
         await SendOkAsync(roomDtos, cancellation: ct);
     }
+    
+    public record Request
+    {
+        public string BuildingCode { get; set; } = null!;
+    };
 }

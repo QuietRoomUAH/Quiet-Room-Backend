@@ -8,10 +8,12 @@ namespace QuietRoom.Server.Services.Db;
 public class SupabaseDbManager : IBuildingRepository, IRoomRepository
 {
     private readonly SupabaseDbContext _dbContext;
-    
-    public SupabaseDbManager(SupabaseDbContext dbContext)
+    private readonly ITimeProvider _timeProvider;
+
+    public SupabaseDbManager(SupabaseDbContext dbContext, ITimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _timeProvider = timeProvider;
     }
 
     /// <inheritdoc />
@@ -36,21 +38,36 @@ public class SupabaseDbManager : IBuildingRepository, IRoomRepository
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(string buildingCode, TimeOnly startTime, TimeOnly endTime,
-                                                                  DayOfWeek dayOfWeek)
+    public async Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(string buildingCode, TimeOnly startTime, 
+                                                                   TimeOnly endTime, DayOfWeek dayOfWeek)
     {
-        var rooms = _dbContext.DaysMet
-            .Where(dayMet => dayMet.DaysMet == dayOfWeek.ToString().ToUpper())
-            .Select(dayMet => dayMet.Event)
-            .Where(room => room.Room.BuildingCode == buildingCode)
-            .Where(room => !(room.StartTime < endTime && room.EndTime > startTime))
-            .Where(room => room.StartDate < DateOnly.FromDateTime(DateTime.Now))
-            .Where(room => room.EndDate > DateOnly.FromDateTime(DateTime.Now))
-            .Select(entity => entity.Room)
-            .ToImmutableHashSet();
-        var roomDtos = rooms.Select(roomEntity => 
-            new RoomDto(roomEntity.BuildingCode, roomEntity.RoomNumber, roomEntity.Capacity, roomEntity.RoomType, ImmutableList<EventDto>.Empty));
-        return Task.FromResult(roomDtos);
+        var now = _timeProvider.Now;
+        var emptyList = ImmutableList<EventDto>.Empty;
+        var dateNow = DateOnly.FromDateTime(now.DateTime);
+        var eventsOccurring = await _dbContext.Events
+            .Where(eventEntity => eventEntity.BuildingCode == buildingCode)
+            .Where(eventEntity => eventEntity.StartDate <= dateNow && eventEntity.EndDate >= dateNow)
+            .Where(eventEntity => eventEntity.StartTime <= endTime && eventEntity.EndTime >= startTime)
+            .ToListAsync();
+        var eventIds = eventsOccurring.Select(eventEntity => eventEntity.Id).ToArray();
+
+        var validEventIds = await _dbContext.DaysMet
+            .Where(dayMetEntity => eventIds.Contains(dayMetEntity.Event.Id))
+            .Where(dayMetEntity => dayMetEntity.DaysMet.Contains(dayOfWeek.ToString().ToUpper()))
+            .Select(dayMetEntity => dayMetEntity.Event.Id)
+            .ToListAsync();
+
+        var roomNumbers = eventsOccurring
+            .Where(eventEntity => validEventIds.Contains(eventEntity.Id))
+            .Select(eventEntity => eventEntity.RoomNumber);
+        
+        var openRooms = await _dbContext.Rooms
+            .Where(roomEntity => roomEntity.BuildingCode == buildingCode)
+            .Where(roomEntity => !roomNumbers.Contains(roomEntity.RoomNumber))
+            .Select(roomEntity => new RoomDto(roomEntity.BuildingCode, roomEntity.RoomNumber, roomEntity.Capacity, 
+                roomEntity.RoomType, emptyList))
+            .ToListAsync();
+        return openRooms;
     }
 
     /// <inheritdoc />
@@ -84,5 +101,23 @@ public class SupabaseDbManager : IBuildingRepository, IRoomRepository
         // Create a room dto from the entity
         var roomDto = roomEntity.ToDto(daysMet);
         return Task.FromResult((RoomDto?) roomDto);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> IsRoomAvailableAsync(string buildingCode, string roomNumber)
+    {
+        var room = await GetRoomInfoAsync(buildingCode, roomNumber);
+        if (room is null) return false;
+        var now = _timeProvider.Now;
+        var nowTime = TimeOnly.FromDateTime(now.DateTime);
+        var nowDate = DateOnly.FromDateTime(now.DateTime);
+        var today = now.DayOfWeek;
+        var areEventsNow = room.Events.Any(eventDto => 
+            eventDto.StartDate <= nowDate && 
+            eventDto.EndDate >= nowDate && 
+            eventDto.StartTime <= nowTime && 
+            eventDto.EndTime >= nowTime &&
+            eventDto.DaysMet.Contains(today));
+        return !areEventsNow;
     }
 }

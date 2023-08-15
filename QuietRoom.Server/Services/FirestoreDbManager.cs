@@ -68,6 +68,9 @@ public class FirestoreDbManager : IRoomRepository, IBuildingRepository
     public Task<RoomDto?> GetRoomInfoAsync(string buildingCode, string roomNumber) => throw new NotSupportedException();
 
     /// <inheritdoc />
+    public async Task<bool> IsRoomAvailableAsync(string buildingCode, string roomNumber) => throw new NotSupportedException();
+
+    /// <inheritdoc />
     public async Task<IEnumerable<string>> GetBuildingNamesAsync()
     {
         var buildings = _db.Collection(BUILDINGS_COLLECTION).ListDocumentsAsync();
@@ -75,7 +78,7 @@ public class FirestoreDbManager : IRoomRepository, IBuildingRepository
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<RoomDto>> GetRoomNumbersAsync(string buildingCode) => throw new NotImplementedException();
+    public Task<IEnumerable<RoomDto>> GetRoomNumbersAsync(string buildingCode) => throw new NotSupportedException();
 
     private static async Task ForEachConcurrentAsync<T>(
         IAsyncEnumerable<T> source,

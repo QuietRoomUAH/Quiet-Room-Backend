@@ -63,18 +63,10 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public record Request
     {
-        public Request()
-        {
-            BuildingCode = null!;
-            StartTime = null!;
-            EndTime = null!;
-            Day = null!;
-        }
-        
-        public string BuildingCode { get; set; }
-        public string StartTime { get; set; }
-        public string EndTime { get; set; }
-        public string Day { get; set; }
+        public string BuildingCode { get; set; } = null!;
+        public string StartTime { get; set; } = null!;
+        public string EndTime { get; set; } = null!;
+        public string Day { get; set; } = null!;
     }
 
     public class RequestValidator : Validator<Request>
