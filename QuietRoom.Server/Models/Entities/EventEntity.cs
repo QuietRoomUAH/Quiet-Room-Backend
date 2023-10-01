@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 
 namespace QuietRoom.Server.Models.Entities;
 
-// Non-nullable field is uninitialized. Consider declaring as nullable.
 #pragma warning disable CS8618 
 [Table("events"), UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class EventEntity
@@ -17,7 +16,7 @@ public class EventEntity
     public string Name { get; set; }
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
-    public string Term { get; set; }
+    public string? Term { get; set; }
     
     public string RoomNumber { get; set; }
     public string BuildingCode { get; set; }

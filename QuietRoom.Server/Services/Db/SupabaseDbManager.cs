@@ -51,12 +51,14 @@ public class SupabaseDbManager : IBuildingRepository, IRoomRepository
             .ToListAsync();
         var eventIds = eventsOccurring.Select(eventEntity => eventEntity.Id).ToArray();
 
-        var validEventIds = await _dbContext.DaysMet
+        var invalidEventIds = await _dbContext.DaysMet
             .Where(dayMetEntity => eventIds.Contains(dayMetEntity.Event.Id))
-            .Where(dayMetEntity => dayMetEntity.DaysMet.Contains(dayOfWeek.ToString().ToUpper()))
+            .Where(dayMetEntity => !dayMetEntity.DaysMet.Contains(dayOfWeek.ToString().ToUpper()))
             .Select(dayMetEntity => dayMetEntity.Event.Id)
             .ToListAsync();
-
+        
+        var validEventIds = eventIds.Except(invalidEventIds).ToImmutableHashSet();
+        
         var roomNumbers = eventsOccurring
             .Where(eventEntity => validEventIds.Contains(eventEntity.Id))
             .Select(eventEntity => eventEntity.RoomNumber);
