@@ -119,7 +119,7 @@ public class SupabaseDbManager : IBuildingRepository, IRoomRepository
             eventDto.EndDate >= nowDate && 
             eventDto.StartTime <= nowTime && 
             eventDto.EndTime >= nowTime &&
-            eventDto.DaysMet.Contains(today));
+            eventDto.DaysMet.Contains(today) || !eventDto.DaysMet.Any());
         return !areEventsNow;
     }
 }
