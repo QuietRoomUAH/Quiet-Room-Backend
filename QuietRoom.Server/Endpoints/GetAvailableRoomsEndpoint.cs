@@ -7,15 +7,9 @@ using QuietRoom.Server.Utils;
 
 namespace QuietRoom.Server.Endpoints;
 
-public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Request, List<string>>
+public class GetAvailableRoomsEndpoint(IRoomRepository roomRepository)
+    : Endpoint<GetAvailableRoomsEndpoint.Request, List<string>>
 {
-    private readonly IRoomRepository _roomRepository;
-
-    public GetAvailableRoomsEndpoint(IRoomRepository roomRepository, ILogger<GetAvailableRoomsEndpoint> logger)
-    {
-        _roomRepository = roomRepository;
-    }
-    
     /// <inheritdoc />
     public override void Configure()
     {
@@ -39,7 +33,7 @@ public class GetAvailableRoomsEndpoint : Endpoint<GetAvailableRoomsEndpoint.Requ
             return new List<string>();
         }
         var sw = Stopwatch.StartNew();
-        var rooms = await _roomRepository.GetAvailableRoomsAsync(req.BuildingCode, startTime, endTime, day);
+        var rooms = await roomRepository.GetAvailableRoomsAsync(req.BuildingCode, startTime, endTime, day);
         var roomsList = rooms.OrderBy(s => s.RoomNumber).Select(dto => dto.RoomNumber).ToList();
         Logger.LogInformation("Got {Count} rooms in {Elapsed}ms", roomsList.Count, sw.ElapsedMilliseconds);
         return roomsList;
