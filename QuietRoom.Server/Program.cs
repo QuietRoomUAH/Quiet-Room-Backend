@@ -23,7 +23,6 @@ var app = builder.Build();
 app.UseCors();
 app.UseRemoveContentTypeMiddleware();
 app.UseResponseCaching();
-app.UseAuthorization();
 app.UseFastEndpoints(config =>
 {
     config.Endpoints.Configurator = ep =>
